@@ -134,9 +134,9 @@ background: var(–bg-body);
 display: flex; flex-direction: column;
 align-items: center; justify-content: center;
 z-index: 200;
-transition: opacity 0.4s ease;
+transition: opacity 0.4s ease, visibility 0.4s ease;
 }
-.loading-overlay.hidden { opacity: 0; pointer-events: none; }
+.loading-overlay.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
 .loading-spinner {
 width: 36px; height: 36px;
 border: 3px solid var(–rule-light);
@@ -493,9 +493,15 @@ font-style: italic; font-family: Georgia, serif;
 
 /* ── ERROR STATE ── */
 .error-banner {
-background: #c0392b; color: white;
-padding: 10px 20px; font-size: 11px; font-weight: 700;
+background: #f0f4ff; color: #1F3864;
+border-bottom: 2px solid #1F3864;
+padding: 8px 20px; font-size: 10px; font-weight: 700;
+letter-spacing: 1.5px; text-transform: uppercase;
 text-align: center; display: none;
+}
+body.dark .error-banner {
+background: #1a2340; color: #7BAFD4;
+border-bottom-color: #7BAFD4;
 }
 .error-banner.visible { display: block; }
 
@@ -519,7 +525,7 @@ text-align: center; display: none;
 <div class="page" id="summons">
 
   <div class="error-banner" id="errorBanner">
-    Unable to load data. Please check the data source and try again.
+    Showing cached data — live update unavailable. Contact the Secretary for the latest details.
   </div>
 
   <!-- ══ PAGE 1 ══ -->
@@ -758,7 +764,10 @@ async function loadData() {
   } finally {
     const overlay = document.getElementById('loadingOverlay');
     overlay.classList.add('hidden');
-    setTimeout(() => overlay.style.display = 'none', 400);
+    // Remove from layout entirely after CSS transition completes
+    overlay.addEventListener('transitionend', () => {
+      overlay.style.display = 'none';
+    }, { once: true });
   }
 }
 
